@@ -19,34 +19,62 @@ const showSuccess = input => {
 };
 
 // Email checker
-const emailCheker = email => {
+const checkEmail = input => {
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(email).toLowerCase());
+  if (re.test(input.value.trim())) {
+    showSuccess(input);
+  } else {
+    showError(input, 'Email must be valid');
+  }
 };
+
+// FieldName
+const getFildName = input => {
+  return input.id.charAt(0).toUpperCase() + input.id.slice(1);
+};
+
+// Length Checking
+const checkLength = (input, min, max) => {
+  if (input.value.length < min) {
+    showError(
+      input,
+      `${getFildName(input)} will must be at least ${min} characters`
+    );
+  } else if (input.value.length > max) {
+    showError(
+      input,
+      `${getFildName(input)} will must be less than ${max} characters`
+    );
+  } else {
+    showSuccess(input);
+  }
+};
+
+// CheckPassword match
+const checkPasswordsMatch = (input1, input2) => {
+  if (input1.value !== input2.value) {
+    showError(input2, 'Passwords not matched');
+  }
+};
+
+// CheckRequired for all the input
+const CheckRequired = inputArr => {
+  inputArr.forEach(input => {
+    if (input.value.trim() === '') {
+      showError(input, `${getFildName(input)} is Required`);
+    } else {
+      showSuccess(input);
+    }
+  });
+};
+
+// EventListener for submitting the form
 
 form.addEventListener('submit', e => {
   e.preventDefault();
-
-  if (username.value === '') {
-    showError(username, 'Username is required');
-  } else {
-    showSuccess(username);
-  }
-  if (email.value === '') {
-    showError(email, 'email is required');
-  } else if (!emailCheker(email.value)) {
-    showError(email, 'email is not vlaid');
-  } else {
-    showSuccess(email);
-  }
-  if (password.value === '') {
-    showError(password, 'Password is required');
-  } else {
-    showSuccess(password);
-  }
-  if (password2.value === '') {
-    showError(password2, 'Conform password is required');
-  } else {
-    showSuccess(password2);
-  }
+  CheckRequired([username, email, password, conformPassword]);
+  checkLength(username, 3, 15);
+  checkLength(password, 6, 25);
+  checkEmail(email);
+  checkPasswordsMatch(password, conformPassword);
 });
